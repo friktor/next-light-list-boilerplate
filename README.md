@@ -1,5 +1,13 @@
 # ISO List
-Simple boilerplate nextjs project. Includes backend, client, dev-proxy, nginx & docker-compose pack.
+Minimal boilerplate nextjs project. Includes backend, client, dev-proxy, nginx & docker-compose pack. Powered by cookies with full SSR support.
+
+![preview](https://raw.githubusercontent.com/friktor/next-light-list-boilerplate/main/media/screenshot.jpg)
+
+**Stack**
+
+NextJS 15, Fastify, PostgreSQL, Docker Compose, Jest, Nginx.
+
+HTTPS support "out of box".
 
 ## Development
 Install all common dependencies for backend & client.
