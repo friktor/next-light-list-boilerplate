@@ -1,0 +1,79 @@
+services:
+  backend:
+    container_name: backend
+    restart: unless-stopped
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+      network: host
+    ports:
+      - "4242:4242"
+    depends_on:
+      - database
+    networks:
+      - localnetwork
+    environment:
+      ORIGIN: https://frontend.test
+      DOMAIN: frontend.test
+      COOKIE_SECRET: secret
+      DB_HOST: database
+      DB_NAME: codelist
+      DB_USER: admin
+      DB_PASS: 1234
+      DB_PORT: 5432
+  client:
+    container_name: client
+    restart: unless-stopped
+    build:
+      dockerfile: Dockerfile
+      context: ./client
+      network: host
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - localnetwork
+    volumes:
+      - client:/static
+    environment:
+      API_URL: http://backend:4242
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - client
+    networks:
+      - localnetwork
+    volumes:
+      - /etc/ssl:/etc/nginx/ssl:ro
+      - client:/app
+    environment:
+      NGINX_HOST: frontend.test
+  database:
+    restart: unless-stopped
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - localnetwork
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_USER: admin
+      POSTGRES_DB: codelist
+      LC_ALL: C.UTF-8
+
+volumes:
+  postgres:
+  client:
+
+networks:
+  localnetwork:
+    driver: bridge
