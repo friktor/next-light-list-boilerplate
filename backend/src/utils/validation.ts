@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import Joi from "joi";
-import { isoCodes } from "./currencies";
+import { isoCodes } from "./countries";
 
 export const validate = (schema: Joi.ObjectSchema) => {
   return (
@@ -38,7 +38,7 @@ export const checkCodes = (codes?: string | string[]): string[] | undefined => {
     }
 
     const invalid = list.reduce<string[]>((arr, code) => {
-      if (!isoCodes.getByCode(code)) {
+      if (!isoCodes.getByCountryCode(code)) {
         arr.push(code);
       }
 

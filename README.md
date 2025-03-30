@@ -3,6 +3,8 @@ Minimal boilerplate nextjs project. Includes backend, client, dev-proxy, nginx &
 
 ![preview](https://raw.githubusercontent.com/friktor/next-light-list-boilerplate/main/media/screenshot.jpg)
 
+[Online Demo](https://floppa-test.ru)
+
 **Stack**
 
 NextJS 15, Fastify, PostgreSQL, Docker Compose, Jest, Nginx.

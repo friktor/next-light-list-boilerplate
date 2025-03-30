@@ -22,7 +22,11 @@
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+
+    // "paths": {
+    //   "@/*": ["./src/*"]
+    // }
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src"]

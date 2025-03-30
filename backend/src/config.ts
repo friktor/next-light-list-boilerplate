@@ -4,7 +4,7 @@ import { DataSourceOptions } from "typeorm";
 import dotenv from "dotenv";
 import path from "path";
 
-import { Currency } from "./entity/Currency";
+import { Country } from "./entity/Country";
 
 const envPath = path.join(
   __dirname,
@@ -40,7 +40,7 @@ export const DATASOURCE: DataSourceOptions = {
   type: "postgres",
 
   migrations: [MIGRATIONS_PATH],
-  entities: [Currency],
+  entities: [Country],
   logging: true,
 };
 
@@ -48,6 +48,13 @@ export const COOKIE: FastifyCookieOptions = {
   secret: config.COOKIE_SECRET,
   hook: "preHandler",
 };
+
+export const ROOT_COOKIE_OPTS = {
+  domain: config.DOMAIN,
+  sameSite: true,
+  secure: true,
+  path: "/",
+}
 
 export const CORS: FastifyCorsOptions = {
   methods: ["GET", "HEAD", "POST", "PATCH"],

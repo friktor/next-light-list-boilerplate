@@ -5,6 +5,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json* ./
 RUN npm ci --legacy-peer-deps
+RUN npm run postinstall
 
 # Rebuild the source code only when needed
 FROM base AS builder

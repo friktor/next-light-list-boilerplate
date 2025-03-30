@@ -1,30 +1,42 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-
-import { CurrenciesResponse, PAGE_ITEMS_LIMIT, PaginationDto } from "../../dto";
 import { ROOT_COOKIE_OPTS } from "../../config";
 import { Country } from "../../entity/Country";
 import * as services from "../../services";
 import * as utils from "../../utils";
 
+import {
+  CountriesQueryParams,
+  CountriesResponse,
+  PAGE_ITEMS_LIMIT,
+  PaginationDto,
+} from "../../dto";
+
 export async function handler(
   this: FastifyInstance,
   request: FastifyRequest<{
-    Querystring: PaginationDto;
+    Querystring: PaginationDto & CountriesQueryParams;
   }>,
-  reply: FastifyReply<{ Body: CurrenciesResponse }>
+  reply: FastifyReply<{ Body: CountriesResponse }>
 ) {
   const sessionId = utils.getSessionId(request);
+  const includeAll = !!request.query.all;
   const page = request.query.page || 1;
+
+  if (!includeAll && !sessionId) {
+    reply.status(401).send({ type: "Unauthorized" });
+    return;
+  }
 
   const repo = this.orm.getRepository(Country);
 
-  const data = await services.currencies.getCurrencies(repo, {
+  const data = await services.countries.getCountriesList(repo, {
+    includeAll,
     sessionId,
     page,
   });
 
-  const response: CurrenciesResponse = {
-    type: "Currencies",
+  const response: CountriesResponse = {
+    type: Country.name,
     data,
     meta: {
       limit: PAGE_ITEMS_LIMIT,
@@ -46,6 +58,7 @@ export const schema: any = {
     type: "object",
     properties: {
       page: { type: "integer", minimum: 1 },
+      all: { type: "boolean" },
     },
   },
   response: {
@@ -57,18 +70,8 @@ export const schema: any = {
           type: "array",
           items: {
             type: "object",
-            properties: Object.assign({}, utils.currencySchema.properties, {
-              countries: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: Object.assign(
-                    {},
-                    utils.countrySchema.properties,
-                    { enabled: { type: "boolean" } }
-                  ),
-                },
-              },
+            properties: Object.assign({}, utils.countrySchema.properties, {
+              enabled: { type: "boolean" },
             }),
           },
         },

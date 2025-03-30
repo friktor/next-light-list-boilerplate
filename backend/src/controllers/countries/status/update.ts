@@ -1,21 +1,22 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { Currency } from "../../entity/Currency";
-import * as utils from "../../utils";
-import { config } from "../../config";
+import { ROOT_COOKIE_OPTS } from "../../../config";
+import { Country } from "../../../entity/Country";
+import * as services from "../../../services";
+import * as utils from "../../../utils";
 
 import {
-  UpdateCurrencyStatusResponse,
-  UpdateCurrencyStatusDto,
-  updateCurrencyStatusDto,
-} from "../../dto";
+  UpdateCountryStatusResponse,
+  UpdateCountryStatusDto,
+  updateCountryStatusDto,
+} from "../../../dto";
 
 export async function handler(
   this: FastifyInstance,
   request: FastifyRequest<{
-    Body: UpdateCurrencyStatusDto;
+    Body: UpdateCountryStatusDto;
   }>,
   reply: FastifyReply<{
-    Body: UpdateCurrencyStatusResponse;
+    Body: UpdateCountryStatusResponse;
   }>
 ) {
   const sessionId = utils.getSessionId(request);
@@ -26,32 +27,28 @@ export async function handler(
     return;
   }
 
-  const currency = Currency.create(code, enabled, sessionId);
-  const repo = this.orm.getRepository(Currency);
-
-  await repo.upsert(currency, {
-    conflictPaths: ["id", "code"],
-    skipUpdateIfNoValuesChanged: true,
-    upsertType: "on-conflict-do-update",
+  const repo = this.orm.getRepository(Country);
+  
+  const country = await services.countries.updateCountryStatus(repo, {
+    sessionId,
+    enabled,
+    code,
   });
 
-  const response: UpdateCurrencyStatusResponse = {
-    type: Currency.name,
-    data: currency,
+  const response: UpdateCountryStatusResponse = {
+    type: Country.name,
+    data: country,
     meta: {},
   };
 
-  reply.header("session", sessionId).setCookie("session", sessionId, {
-    domain: config.DOMAIN,
-    sameSite: true,
-    secure: true,
-    path: "/",
-  });
+  reply
+    .setCookie("session", sessionId, ROOT_COOKIE_OPTS)
+    .header("session", sessionId);
 
   reply.status(200).send(response);
 }
 
-export const preValidation = utils.validate(updateCurrencyStatusDto);
+export const preValidation = utils.validate(updateCountryStatusDto);
 
 export const schema: any = {
   body: {
@@ -72,7 +69,6 @@ export const schema: any = {
           properties: {
             enabled: { type: "boolean" },
             code: { type: "string" },
-            sessionId: { type: "string" },
           },
         },
       },

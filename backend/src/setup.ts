@@ -17,5 +17,6 @@ export function setup() {
       .register(cors, config.CORS)
       .register(swagger)
       .register(swaggerUI, { routePrefix: "/api/swagger" })
-      .register(controllers.currencies, { prefix: "/api/currency" });
+      .register(controllers.countries, { prefix: "/api/countries" })
+      .register(controllers.currencies, { prefix: "/api/currencies" });
 }

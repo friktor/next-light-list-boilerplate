@@ -4,6 +4,4 @@ node_modules/
 dist/
 tmp/
 temp/
-yarn.lock
 .env*
-package-lock.json
